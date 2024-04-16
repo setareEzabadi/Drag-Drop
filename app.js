@@ -1,4 +1,5 @@
 let dropArea = document.getElementById("dropArea");
+let tokenInput = document.getElementById("tokenInput");
 
 ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
   dropArea.addEventListener(eventName, preventDefaults, false);
@@ -37,37 +38,44 @@ function handleFiles(files) {
 
 function uploadFile(file) {
   let formData = new FormData();
-  formData.append("file", file);
-  let token = "YOUR_TOKEN_HERE";
+  formData.tokenappend("file", file);
+  let token = tokenInput.value;
+  formData.append("_token", token);
+
+  if (!token) {
+    console.error("Token is required.");
+    displayError();
+    return;
+  }
 
   fetch("/upload", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
     body: formData,
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data.success) {
-        displaySuccess();
-        dropArea.textContent = "";
+      if (data.status && data.message === "url") {
+        displaySuccess(data.message);
       } else {
-        displayError();
+        displayError(data.message);
       }
-    })
+    })    
     .catch((error) => {
       console.error("Error uploading file:", error);
       displayError();
     });
 }
 
-function displaySuccess() {
+function displaySuccess(message) {
   dropArea.classList.add("valid");
-  dropArea.textContent = "File uploaded successfully!";
+  dropArea.innerHTML = `
+    <p>File uploaded successfully!</p>
+    <a href="${message}" target="_blank">Download URL</a>
+  `;
 }
 
-function displayError() {
+
+function displayError(message) {
   dropArea.classList.add("error");
-  dropArea.textContent = "Error uploading file!";
+  dropArea.textContent = `Error: ${message}`;
 }
