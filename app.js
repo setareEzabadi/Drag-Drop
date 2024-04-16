@@ -38,9 +38,13 @@ function handleFiles(files) {
 function uploadFile(file) {
   let formData = new FormData();
   formData.append("file", file);
+  let token = "YOUR_TOKEN_HERE";
 
   fetch("/upload", {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     body: formData,
   })
     .then((response) => response.json())
