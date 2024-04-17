@@ -54,7 +54,7 @@ function uploadFile(file) {
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data.status && data.message === "url") {
+      if (data.status) {
         displaySuccess(data.message);
       } else {
         displayError(data.message);
